@@ -28,19 +28,14 @@ app.get("/api/:date?", function(req, res) {
   let dateParam = req.params.date;
   let output;
 
-  function isValidUnixTimestamp(MaybeUnixNum) {
-    if (isNaN(MaybeUnixNum)) {
-      return false;
-    }
-
-    let date = new Date(MaybeUnixNum);
-    return !isNaN(date.getTime());
+  if (!isNaN(Number(dateParam))) {
+    dateParam = Number(dateParam);
   }
 
   if (!dateParam) {
     output = new Date();
-  } else if (isValidUnixTimestamp(Number(dateParam))) {
-    output = new Date(Number(dateParam));
+  } else if (isValidDate(dateParam)) {
+    output = new Date(dateParam);
   } else {
     res.json({ error : "Invalid Date" });
     return;
@@ -50,6 +45,11 @@ app.get("/api/:date?", function(req, res) {
     unix: output.getTime(),
     utc: output.toUTCString()
   })
+
+  function isValidDate(MaybeUnixNum) {
+    let date = new Date(MaybeUnixNum);
+    return !isNaN(date.getTime());
+  }
 });
 
 // Listen on port set in environment variable or default to 3000
